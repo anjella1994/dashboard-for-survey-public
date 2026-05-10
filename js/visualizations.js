@@ -1549,6 +1549,9 @@ const HORIZONTAL_GUIDE_BOTTOM_OVERHANG = 4;
 
 function buildHorizontalGuideHtml(ticks, leftFor, overlayHeight) {
   const safeHeight = Math.max(0, Number(overlayHeight) || 0) + HORIZONTAL_GUIDE_BOTTOM_OVERHANG;
+
+function buildHorizontalGuideHtml(ticks, leftFor, overlayHeight) {
+  const safeHeight = Math.max(0, Number(overlayHeight) || 0);
   const guideHtml = (ticks || [])
     .map(tick => `<span class="horizontal-chart-guide" style="left:${leftFor(tick)}%;"></span>`)
     .join('');
