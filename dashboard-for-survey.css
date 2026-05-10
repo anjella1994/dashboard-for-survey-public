@@ -58,25 +58,25 @@
 }
 
 :root {
-  --heading-1-size: 28px;
-  --heading-2-size: 24px;
-  --heading-3-size: 20px;
-  --heading-4-size: 18px;
-  --heading-5-size: 16px;
-  --heading-6-size: 14px;
-  --body-1-size: 18px;
-  --body-2-size: 16px;
-  --body-3-size: 14px;
-  --label-1-size: 14px;
-  --label-2-size: 13px;
-  --button-1-size: 14px;
-  --button-2-size: 13px;
+  --heading-1-size: 1.75rem; /* 28px */
+  --heading-2-size: 1.5rem; /* 24px */
+  --heading-3-size: 1.25rem; /* 20px */
+  --heading-4-size: 1.125rem; /* 18px */
+  --heading-5-size: 1rem; /* 16px */
+  --heading-6-size: 0.875rem; /* 14px */
+  --body-1-size: 1.125rem; /* 18px */
+  --body-2-size: 1rem; /* 16px */
+  --body-3-size: 0.875rem; /* 14px */
+  --label-1-size: 0.875rem; /* 14px */
+  --label-2-size: 0.8125rem; /* 13px */
+  --button-1-size: 0.875rem; /* 14px */
+  --button-2-size: 0.8125rem; /* 13px */
   --button-1-icon-size: 16px;
   --button-2-icon-size: 14px;
   --icon-button-size: 24px;
   --icon-button-icon-size: 16px;
-  --caption-1-size: 12px;
-  --caption-2-size: 11px;
+  --caption-1-size: 0.75rem; /* 12px */
+  --caption-2-size: 0.6875rem; /* 11px */
   --button-1-padding: 7px 14px;
   --button-2-padding: 6px 12px;
   --button-1-radius: 8px;
@@ -2778,7 +2778,7 @@ body.filter-dragging .filter-add-btn:hover {
 }
 
 .horizontal-chart-axis-row {
-  margin-top: 4px;
+  margin-top: 8px;
   align-items: start;
   display: grid;
   grid-template-columns: var(--viz-label-col-width) minmax(0, 1fr) var(--viz-bar-right-col);
