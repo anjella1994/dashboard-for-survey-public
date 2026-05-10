@@ -1543,6 +1543,50 @@ const SINGLE_BAR_COLOR = DATA_VIZ_COLORS.singleBar;
 const COMPARE_BAR_COLOR = DATA_VIZ_COLORS.compareBar;
 const HBAR_INSIDE_VALUE_THRESHOLD = 90;
 
+const HORIZONTAL_PERCENT_GUIDE_TICKS = [0, 20, 40, 60, 80, 100];
+const HORIZONTAL_PERCENT_AXIS_TICKS = HORIZONTAL_PERCENT_GUIDE_TICKS.slice(1);
+
+function buildHorizontalGuideHtml(ticks, leftFor, overlayHeight) {
+  const safeHeight = Math.max(0, Number(overlayHeight) || 0);
+  const guideHtml = (ticks || [])
+    .map(tick => `<span class="horizontal-chart-guide" style="left:${leftFor(tick)}%;"></span>`)
+    .join('');
+  return `<div class="horizontal-chart-guides" style="height:${safeHeight}px;" aria-hidden="true">${guideHtml}</div>`;
+}
+
+function buildHorizontalAxisHtml(ticks, options = {}) {
+  const {
+    leftFor = tick => tick,
+    labelFor = tick => `${tick}`,
+    includeRightSpacer = false,
+    rightSpacerClass = ''
+  } = options;
+  const axisHtml = (ticks || [])
+    .map(tick => `<span class="horizontal-chart-axis-label" style="left:${leftFor(tick)}%;">${labelFor(tick)}</span>`)
+    .join('');
+  const rightSpacerHtml = includeRightSpacer
+    ? `<div${rightSpacerClass ? ` class="${rightSpacerClass}"` : ''}></div>`
+    : '';
+
+  return `
+      <div class="horizontal-chart-axis-row" aria-hidden="true">
+        <div class="horizontal-chart-axis-spacer"></div>
+        <div class="horizontal-chart-axis">${axisHtml}</div>
+        ${rightSpacerHtml}
+      </div>`;
+}
+
+function buildHorizontalPercentGuideHtml(overlayHeight) {
+  return buildHorizontalGuideHtml(HORIZONTAL_PERCENT_GUIDE_TICKS, tick => tick, overlayHeight);
+}
+
+function buildHorizontalPercentAxisHtml({ includeRightSpacer = false } = {}) {
+  return buildHorizontalAxisHtml(HORIZONTAL_PERCENT_AXIS_TICKS, {
+    labelFor: tick => `${tick}%`,
+    includeRightSpacer
+  });
+}
+
 function choiceNeutralColor(index) {
   const idx = Math.max(0, Number(index) || 0);
   return CHOICE_COLOR_PALETTE[idx % CHOICE_COLOR_PALETTE.length];
@@ -3223,18 +3267,11 @@ function buildBasicChartHtml(data) {
     `;
   }).join('');
   const overlayHeight = rows.length * 40 - 8;
-  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
-  const axisHtml = [20, 40, 60, 80, 100].map(t =>
-    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
-  ).join('');
   return `
     <div class="single-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      ${buildHorizontalPercentGuideHtml(overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">${axisHtml}</div>
-      </div>
+      ${buildHorizontalPercentAxisHtml()}
     </div>
   `;
 }
@@ -3387,6 +3424,7 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
   const displayGroups = getDisplayGroupResults(data.groupResults, hiddenGroups);
   const displayGroupKeys = new Set(displayGroups.map(g => g.value));
   const items = buildGroupCompareItems(data);
+  const overlayHeight = items.length * 40 - 8;
 
   const rowHtml = items.map(item => {
     const overallPct = Math.max(0, Math.min(100, item.overallPct || 0));
@@ -3416,7 +3454,13 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
       </div>
     `;
   }).join('');
-  return `<div class="single-hbar-chart group-compare">${rowHtml}</div>`;
+  return `
+    <div class="single-hbar-chart group-compare">
+      ${buildHorizontalPercentGuideHtml(overlayHeight)}
+      ${rowHtml}
+      ${buildHorizontalPercentAxisHtml()}
+    </div>
+  `;
 }
 
 function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
@@ -3460,18 +3504,11 @@ function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
   const G = displayGroups.length;
   const rowH = G * 32 + Math.max(0, G - 1) * 4;
   const overlayHeight = items.length * rowH + Math.max(0, items.length - 1) * 16;
-  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
-  const axisHtml = [20, 40, 60, 80, 100].map(t =>
-    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
-  ).join('');
   return `
     <div class="dual-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      ${buildHorizontalPercentGuideHtml(overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">${axisHtml}</div>
-      </div>
+      ${buildHorizontalPercentAxisHtml()}
     </div>
   `;
 }
@@ -6301,10 +6338,6 @@ function buildRankLollipopChartHtml(data) {
     return ((safeValue - axisMin) / (axisMax - axisMin)) * 100;
   };
   const overlayHeight = rows.length * 40 - 8;
-  const guideOverlayHtml = axisTicks.map(tick => {
-    const tickPct = pctFor(tick);
-    return `<span class="horizontal-chart-guide" style="left:${tickPct}%;"></span>`;
-  }).join('');
   const rowHtml = rows.map((r) => {
     const rankObj = data.ranking.find(item => item.option === r.option);
     const posText = rankObj ? `${rankObj.position}위` : '-';
@@ -6333,19 +6366,13 @@ function buildRankLollipopChartHtml(data) {
   }).join('');
   return `
     <div class="lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">
-          ${axisTicks.map(tick => {
-            const leftPct = pctFor(tick);
-            const cls = tick === axisMin ? 'is-start' : (tick === axisMax ? 'is-end' : 'is-mid');
-            return `<span class="horizontal-chart-axis-label ${cls}" style="left:${leftPct}%;">${tick}</span>`;
-          }).join('')}
-        </div>
-        <div class="lollipop-h-axis-rank-spacer"></div>
-      </div>
+      ${buildHorizontalAxisHtml(axisTicks, {
+        leftFor: pctFor,
+        includeRightSpacer: true,
+        rightSpacerClass: 'lollipop-h-axis-rank-spacer'
+      })}
     </div>
   `;
 }
@@ -6363,10 +6390,6 @@ function buildRankLollipopGroupCompareChartHtml(data, hiddenGroups = new Set()) 
   };
   const displayGroups = getDisplayGroupResults(data.groupResults, hiddenGroups);
   const overlayHeight = rows.length * 40 - 8;
-  const guideOverlayHtml = axisTicks.map(tick => {
-    const tickPct = pctFor(tick);
-    return `<span class="horizontal-chart-guide" style="left:${tickPct}%;"></span>`;
-  }).join('');
   const rowHtml = rows.map((r) => {
     const rankObj = data.ranking.find(item => item.option === r.option);
     const posText = rankObj ? `${rankObj.position}위` : '-';
@@ -6406,19 +6429,13 @@ function buildRankLollipopGroupCompareChartHtml(data, hiddenGroups = new Set()) 
   }).join('');
   return `
     <div class="lollipop-h-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">
-          ${axisTicks.map(tick => {
-            const leftPct = pctFor(tick);
-            const cls = tick === axisMin ? 'is-start' : (tick === axisMax ? 'is-end' : 'is-mid');
-            return `<span class="horizontal-chart-axis-label ${cls}" style="left:${leftPct}%;">${tick}</span>`;
-          }).join('')}
-        </div>
-        <div class="lollipop-h-axis-rank-spacer"></div>
-      </div>
+      ${buildHorizontalAxisHtml(axisTicks, {
+        leftFor: pctFor,
+        includeRightSpacer: true,
+        rightSpacerClass: 'lollipop-h-axis-rank-spacer'
+      })}
     </div>
   `;
 }
@@ -6439,10 +6456,6 @@ function buildRankDualLollipopChartHtml(data, hiddenGroups = new Set()) {
   const trackGap = 4;
   const rowGap = 16;
   const overlayHeight = rows.length * (displayGroups.length * trackH + (displayGroups.length - 1) * trackGap) + (rows.length - 1) * rowGap;
-  const guideOverlayHtml = axisTicks.map(tick => {
-    const tickPct = pctFor(tick);
-    return `<span class="horizontal-chart-guide" style="left:${tickPct}%;"></span>`;
-  }).join('');
   const rowHtml = rows.map((r) => {
     const rankObj = data.ranking.find(item => item.option === r.option);
     const posText = rankObj ? `${rankObj.position}위` : '-';
@@ -6483,19 +6496,13 @@ function buildRankDualLollipopChartHtml(data, hiddenGroups = new Set()) {
   }).join('');
   return `
     <div class="dual-lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">
-          ${axisTicks.map(tick => {
-            const leftPct = pctFor(tick);
-            const cls = tick === axisMin ? 'is-start' : (tick === axisMax ? 'is-end' : 'is-mid');
-            return `<span class="horizontal-chart-axis-label ${cls}" style="left:${leftPct}%;">${tick}</span>`;
-          }).join('')}
-        </div>
-        <div class="lollipop-h-axis-rank-spacer"></div>
-      </div>
+      ${buildHorizontalAxisHtml(axisTicks, {
+        leftFor: pctFor,
+        includeRightSpacer: true,
+        rightSpacerClass: 'lollipop-h-axis-rank-spacer'
+      })}
     </div>
   `;
 }
@@ -6617,19 +6624,11 @@ function buildRankStackChartHtml(data, hiddenRanks) {
     `;
   }).join('');
   const overlayHeight = rows.length * 40 - 8;
-  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
-  const axisHtml = [20, 40, 60, 80, 100].map(t =>
-    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
-  ).join('');
   return `
     <div class="stack-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      ${buildHorizontalPercentGuideHtml(overlayHeight)}
       ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">${axisHtml}</div>
-        <div></div>
-      </div>
+      ${buildHorizontalPercentAxisHtml({ includeRightSpacer: true })}
     </div>
   `;
 }
