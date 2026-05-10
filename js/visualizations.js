@@ -1545,6 +1545,10 @@ const HBAR_INSIDE_VALUE_THRESHOLD = 90;
 
 const HORIZONTAL_PERCENT_GUIDE_TICKS = [0, 20, 40, 60, 80, 100];
 const HORIZONTAL_PERCENT_AXIS_TICKS = HORIZONTAL_PERCENT_GUIDE_TICKS.slice(1);
+const HORIZONTAL_GUIDE_BOTTOM_OVERHANG = 4;
+
+function buildHorizontalGuideHtml(ticks, leftFor, overlayHeight) {
+  const safeHeight = Math.max(0, Number(overlayHeight) || 0) + HORIZONTAL_GUIDE_BOTTOM_OVERHANG;
 
 function buildHorizontalGuideHtml(ticks, leftFor, overlayHeight) {
   const safeHeight = Math.max(0, Number(overlayHeight) || 0);
