@@ -3229,7 +3229,7 @@ function buildBasicChartHtml(data) {
   ).join('');
   return `
     <div class="single-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -3388,6 +3388,12 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
   const displayGroupKeys = new Set(displayGroups.map(g => g.value));
   const items = buildGroupCompareItems(data);
 
+  const overlayHeight = items.length * 40 - 8;
+  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
+  const axisHtml = [20, 40, 60, 80, 100].map(t =>
+    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
+  ).join('');
+
   const rowHtml = items.map(item => {
     const overallPct = Math.max(0, Math.min(100, item.overallPct || 0));
     const labelTip = encodeURIComponent(JSON.stringify({ kind: 'option-label', option: item.label }));
@@ -3416,7 +3422,16 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
       </div>
     `;
   }).join('');
-  return `<div class="single-hbar-chart group-compare">${rowHtml}</div>`;
+  return `
+    <div class="single-hbar-chart group-compare">
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
+      ${rowHtml}
+      <div class="horizontal-chart-axis-row" aria-hidden="true">
+        <div class="horizontal-chart-axis-spacer"></div>
+        <div class="horizontal-chart-axis">${axisHtml}</div>
+      </div>
+    </div>
+  `;
 }
 
 function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
@@ -3466,7 +3481,7 @@ function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
   ).join('');
   return `
     <div class="dual-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6333,7 +6348,7 @@ function buildRankLollipopChartHtml(data) {
   }).join('');
   return `
     <div class="lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6406,7 +6421,7 @@ function buildRankLollipopGroupCompareChartHtml(data, hiddenGroups = new Set()) 
   }).join('');
   return `
     <div class="lollipop-h-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6483,7 +6498,7 @@ function buildRankDualLollipopChartHtml(data, hiddenGroups = new Set()) {
   }).join('');
   return `
     <div class="dual-lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6623,7 +6638,7 @@ function buildRankStackChartHtml(data, hiddenRanks) {
   ).join('');
   return `
     <div class="stack-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
