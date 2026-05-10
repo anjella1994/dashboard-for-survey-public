@@ -3229,7 +3229,7 @@ function buildBasicChartHtml(data) {
   ).join('');
   return `
     <div class="single-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -3388,12 +3388,6 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
   const displayGroupKeys = new Set(displayGroups.map(g => g.value));
   const items = buildGroupCompareItems(data);
 
-  const overlayHeight = items.length * 40 - 8;
-  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
-  const axisHtml = [20, 40, 60, 80, 100].map(t =>
-    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
-  ).join('');
-
   const rowHtml = items.map(item => {
     const overallPct = Math.max(0, Math.min(100, item.overallPct || 0));
     const labelTip = encodeURIComponent(JSON.stringify({ kind: 'option-label', option: item.label }));
@@ -3422,16 +3416,7 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
       </div>
     `;
   }).join('');
-  return `
-    <div class="single-hbar-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
-      ${rowHtml}
-      <div class="horizontal-chart-axis-row" aria-hidden="true">
-        <div class="horizontal-chart-axis-spacer"></div>
-        <div class="horizontal-chart-axis">${axisHtml}</div>
-      </div>
-    </div>
-  `;
+  return `<div class="single-hbar-chart group-compare">${rowHtml}</div>`;
 }
 
 function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
@@ -3481,7 +3466,7 @@ function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
   ).join('');
   return `
     <div class="dual-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6348,7 +6333,7 @@ function buildRankLollipopChartHtml(data) {
   }).join('');
   return `
     <div class="lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6421,7 +6406,7 @@ function buildRankLollipopGroupCompareChartHtml(data, hiddenGroups = new Set()) 
   }).join('');
   return `
     <div class="lollipop-h-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6498,7 +6483,7 @@ function buildRankDualLollipopChartHtml(data, hiddenGroups = new Set()) {
   }).join('');
   return `
     <div class="dual-lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -6638,7 +6623,7 @@ function buildRankStackChartHtml(data, hiddenRanks) {
   ).join('');
   return `
     <div class="stack-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${overlayHeight}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
@@ -9712,16 +9697,12 @@ function hookFilterUpdates() {
   };
 }
 
-function logInitError(step, error) {
-  console.error(`[initResultFeature] ${step} failed`, error);
-}
-
 async function initResultFeature() {
   if (resultState.initialized) return;
   resultState.initialized = true;
 
   const shareToken = new URLSearchParams(location.search).get('share');
-  try { await loadSurveysFromServer(shareToken || undefined); } catch (error) { logInitError('loadSurveysFromServer', error); }
+  try { await loadSurveysFromServer(shareToken || undefined); } catch (_) {}
 
   const currentId = sessionStorage.getItem('survey.currentId');
   if (currentId) {
@@ -9732,35 +9713,35 @@ async function initResultFeature() {
         const rows = await loadCodebookRows(cur.files.codebook);
         if (rows) {
           resultState.codebookByLabel = buildCodebookIndex(rows);
-          try { renderTree(buildQuestionTree(rows)); } catch (error) { logInitError('renderTree', error); }
+          try { renderTree(buildQuestionTree(rows)); } catch (_) {}
         }
-      } catch (error) { logInitError('loadCodebookRows', error); }
+      } catch (_) {}
     }
     const titleEl = document.getElementById('project-title');
     if (titleEl && cur && cur.title) {
-      try { titleEl.textContent = cur.title; } catch (error) { logInitError('setProjectTitle', error); }
+      try { titleEl.textContent = cur.title; } catch (_) {}
     }
   }
 
-  try { setupAccordion && setupAccordion(); } catch (error) { logInitError('setupAccordion', error); }
-  try { setupSearch && setupSearch(); } catch (error) { logInitError('setupSearch', error); }
-  try { setupPanelToggle && setupPanelToggle(); } catch (error) { logInitError('setupPanelToggle', error); }
-  try { setupSelectionAndDragDrop && setupSelectionAndDragDrop(); } catch (error) { logInitError('setupSelectionAndDragDrop', error); }
-  try { setupOtherResponseModal && setupOtherResponseModal(); } catch (error) { logInitError('setupOtherResponseModal', error); }
-  try { setupScaleCompareModal && setupScaleCompareModal(); } catch (error) { logInitError('setupScaleCompareModal', error); }
-  try { setupGroupConfigModal && setupGroupConfigModal(); } catch (error) { logInitError('setupGroupConfigModal', error); }
-  try { setupTitleRename && setupTitleRename(); } catch (error) { logInitError('setupTitleRename', error); }
-  try { setupSavedModal && setupSavedModal(); } catch (error) { logInitError('setupSavedModal', error); }
-  try { await setupFilters(); } catch (error) { logInitError('setupFilters', error); }
+  try { setupAccordion && setupAccordion(); } catch (_) {}
+  try { setupSearch && setupSearch(); } catch (_) {}
+  try { setupPanelToggle && setupPanelToggle(); } catch (_) {}
+  try { setupSelectionAndDragDrop && setupSelectionAndDragDrop(); } catch (_) {}
+  try { setupOtherResponseModal && setupOtherResponseModal(); } catch (_) {}
+  try { setupScaleCompareModal && setupScaleCompareModal(); } catch (_) {}
+  try { setupGroupConfigModal && setupGroupConfigModal(); } catch (_) {}
+  try { setupTitleRename && setupTitleRename(); } catch (_) {}
+  try { setupSavedModal && setupSavedModal(); } catch (_) {}
+  try { await setupFilters(); } catch (_) {}
 
-  try { hookFilterUpdates(); } catch (error) { logInitError('hookFilterUpdates', error); }
-  try { observeDropZones(); } catch (error) { logInitError('observeDropZones', error); }
+  hookFilterUpdates();
+  observeDropZones();
   window.addEventListener('resize', () => {
     const container = document.getElementById('result-container');
     alignGroupCompareCharts(container);
     alignScaleCompareCharts(container);
   });
-  renderResults().catch(error => logInitError('renderResults', error));
+  renderResults();
 }
 
 if (document.readyState === 'loading') {
