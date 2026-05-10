@@ -1541,6 +1541,7 @@ const CUSTOM_GROUP_PALETTE = [
 ];
 const SINGLE_BAR_COLOR = DATA_VIZ_COLORS.singleBar;
 const COMPARE_BAR_COLOR = DATA_VIZ_COLORS.compareBar;
+const HORIZONTAL_GUIDE_OVERHANG_PX = 4;
 const HBAR_INSIDE_VALUE_THRESHOLD = 90;
 
 const HORIZONTAL_PERCENT_GUIDE_TICKS = [0, 20, 40, 60, 80, 100];
@@ -3273,8 +3274,7 @@ function buildBasicChartHtml(data) {
   const overlayHeight = rows.length * 40 - 8;
   return `
     <div class="single-hbar-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
-      ${buildHorizontalPercentGuideHtml(overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       ${buildHorizontalPercentAxisHtml()}
     </div>
@@ -3437,6 +3437,12 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
     `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
   ).join('');
 
+  const overlayHeight = items.length * 40 - 8;
+  const guideHtml = [0, 20, 40, 60, 80, 100].map(t => `<span class="horizontal-chart-guide" style="left:${t}%;"></span>`).join('');
+  const axisHtml = [20, 40, 60, 80, 100].map(t =>
+    `<span class="horizontal-chart-axis-label" style="left:${t}%;">${t}%</span>`
+  ).join('');
+
   const rowHtml = items.map(item => {
     const overallPct = Math.max(0, Math.min(100, item.overallPct || 0));
     const labelTip = encodeURIComponent(JSON.stringify({ kind: 'option-label', option: item.label }));
@@ -3467,15 +3473,12 @@ function buildGroupCompareChartHtml(data, hiddenGroups = new Set()) {
   }).join('');
   return `
     <div class="single-hbar-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       <div class="horizontal-chart-axis-row" aria-hidden="true">
         <div class="horizontal-chart-axis-spacer"></div>
         <div class="horizontal-chart-axis">${axisHtml}</div>
       </div>
-      ${buildHorizontalPercentGuideHtml(overlayHeight)}
-      ${rowHtml}
-      ${buildHorizontalPercentAxisHtml()}
     </div>
   `;
 }
@@ -3523,7 +3526,7 @@ function buildDualHbarChartHtml(data, hiddenGroups = new Set()) {
   const overlayHeight = items.length * rowH + Math.max(0, items.length - 1) * 16;
   return `
     <div class="dual-hbar-chart">
-      ${buildHorizontalPercentGuideHtml(overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       ${buildHorizontalPercentAxisHtml()}
     </div>
@@ -6383,8 +6386,7 @@ function buildRankLollipopChartHtml(data) {
   }).join('');
   return `
     <div class="lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
-      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       ${buildHorizontalAxisHtml(axisTicks, {
         leftFor: pctFor,
@@ -6447,8 +6449,7 @@ function buildRankLollipopGroupCompareChartHtml(data, hiddenGroups = new Set()) 
   }).join('');
   return `
     <div class="lollipop-h-chart group-compare">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
-      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       ${buildHorizontalAxisHtml(axisTicks, {
         leftFor: pctFor,
@@ -6515,8 +6516,7 @@ function buildRankDualLollipopChartHtml(data, hiddenGroups = new Set()) {
   }).join('');
   return `
     <div class="dual-lollipop-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideOverlayHtml}</div>
-      ${buildHorizontalGuideHtml(axisTicks, pctFor, overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideOverlayHtml}</div>
       ${rowHtml}
       ${buildHorizontalAxisHtml(axisTicks, {
         leftFor: pctFor,
@@ -6646,8 +6646,7 @@ function buildRankStackChartHtml(data, hiddenRanks) {
   const overlayHeight = rows.length * 40 - 8;
   return `
     <div class="stack-h-chart">
-      <div class="horizontal-chart-guides" style="height:${overlayHeight + 4}px;" aria-hidden="true">${guideHtml}</div>
-      ${buildHorizontalPercentGuideHtml(overlayHeight)}
+      <div class="horizontal-chart-guides" style="height:${Math.max(0, overlayHeight + HORIZONTAL_GUIDE_OVERHANG_PX)}px;" aria-hidden="true">${guideHtml}</div>
       ${rowHtml}
       ${buildHorizontalPercentAxisHtml({ includeRightSpacer: true })}
     </div>

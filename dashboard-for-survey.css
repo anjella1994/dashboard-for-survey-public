@@ -1077,12 +1077,13 @@ button {
   background: var(--neutral-200);
 }
 
-.accordion-header {
+.accordion-header,
+.sub-accordion-header {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0 10px 4px;
+  padding: 0.7142857em 0 0.7142857em 0.2857143em; /* 10px 0 10px 4px at 14px */
   font-size: var(--heading-6-size);
   line-height: var(--heading-line-height);
   font-weight: var(--font-weight-semibold);
@@ -1090,20 +1091,29 @@ button {
   text-align: left;
 }
 
-.accordion-header:hover {
+.accordion-header:hover,
+.sub-accordion-header:hover {
   color: var(--neutral-900);
 }
 
-.accordion-label {
+.accordion-label,
+.sub-accordion-label {
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: inherit;
+  line-height: inherit;
 }
 
-.accordion-chev {
-  width: 24px;
-  height: 24px;
+.accordion-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4285714em; /* 6px at 14px */
+}
+
+.accordion-chev,
+.sub-accordion-chev {
+  width: 1.7142857em; /* 24px at 14px */
+  height: 1.7142857em; /* 24px at 14px */
+  flex: 0 0 1.7142857em; /* 24px at 14px */
   object-fit: contain;
   opacity: var(--icon-opacity);
   transform: rotate(0deg);
@@ -1156,37 +1166,10 @@ button {
   background: linear-gradient(to right, transparent 0, transparent 8px, var(--neutral-200) 8px, var(--neutral-200) 100%);
 }
 
-.sub-accordion-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0 10px 4px;
-  font-size: var(--heading-6-size);
-  line-height: var(--heading-line-height);
-  font-weight: var(--font-weight-semibold);
-  color: var(--neutral-800);
-  text-align: left;
-}
-
-.sub-accordion-header:hover {
-  color: var(--neutral-900);
-}
-
 .sub-accordion-label {
-  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.sub-accordion-chev {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  opacity: var(--icon-opacity);
-  transform: rotate(0deg);
-  transition: transform .15s, opacity .15s;
 }
 
 .accordion-subcategory.open .sub-accordion-chev {
